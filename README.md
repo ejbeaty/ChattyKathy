@@ -46,7 +46,7 @@ The proper way to approach this is with [Amazon Cognito](http://docs.aws.amazon.
 ##### Settings { JSON Object  }
 Property | Type | Default | Example | Details  
 :------ | :------ | :------ | :-----| :------
-**awsCredentials** | Object |  |  | Any credentials object from the AWS Javascript SDK that satisfies the [Polly API's](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Polly.html) constructor
+**awsCredentials** | Object | null |  | Any credentials object from the AWS Javascript SDK that satisfies the [Polly API's](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Polly.html) constructor
 **awsRegion** | string | null |```'us-west-2'```| The AWS Region you want to use
 **pollyVoiceId** _(optional)_| string | ```'Amy'``` || Any valid VoiceId supported by [Polly.synthesizeSpeech](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Polly.html#synthesizeSpeech-property)
 **cacheSpeech** _(optional)_| bool | true |  | When true, ChattyKathy will cache speech to the browser's localStorage after making a request to AWS and check there before each call to the API.
