@@ -1,6 +1,8 @@
 # ChattyKathy
 ChattyKathy is a wrapper for  Amazon's Aws.Polly library. You pass ChattyKathy an AWS Credentials object and she'll handle the calls to AWS Polly for you, turn the response into audio, and then play the audio.
 
+## Dependencies
+- [AWS Javascript SDK](https://aws.amazon.com/sdk-for-browser/) version 2.7.13 or higher
 ## Getting Started
 ### Basic Usage
 ```javascript
