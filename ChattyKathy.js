@@ -23,7 +23,6 @@
 function ChattyKathy(settings) {
 
     settings = getValidatedSettings(settings);
-    
 
     // Add audio node to html
     var elementId = "audioElement" + new Date().valueOf().toString();
@@ -31,7 +30,6 @@ function ChattyKathy(settings) {
     var audioElement = document.getElementById(elementId);
 
     var isSpeaking = false;
-    
 
     AWS.config.credentials = settings.awsCredentials;
     AWS.config.region = settings.awsRegion;
@@ -66,6 +64,7 @@ function ChattyKathy(settings) {
         }
 
     }
+
     // Quit talking
     function shutUp() {
         audioElement.pause();
@@ -79,10 +78,6 @@ function ChattyKathy(settings) {
             getAudio(message)
                 .then(playAudio)
                 .then(successCallback);
-
-            //requestSpeechFromAWS(message)
-            //    .then(playAudio)
-            //    .then(successCallback);
         });
     }
 
