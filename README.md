@@ -3,6 +3,7 @@ ChattyKathy is a wrapper for  Amazon's Aws.Polly library. You pass ChattyKathy a
 
 ## Dependencies
 - [AWS Javascript SDK](https://aws.amazon.com/sdk-for-browser/) version 2.7.13 or higher
+
 ## Getting Started
 ### Basic Usage
 ```javascript
