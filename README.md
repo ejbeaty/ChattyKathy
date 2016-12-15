@@ -2,26 +2,7 @@
 ChattyKathy is a wrapper for  Amazon's Aws.Polly library. You pass ChattyKathy an AWS Credentials object and she'll handle the calls to AWS Polly for you, turn the response into audio, and then play the audio.
 
 ## Getting Started
-### AWS Credentials
-First you need to configure your AWS Credentials. The quick and dirty way to do this is to pass your AWS AccessKeyId and SecretAccessKey directly to the AWS.Credentials object in the [AWS Javascript SDK](https://aws.amazon.com/sdk-for-browser/).
-```javascript
-var awsCredentials = new AWS.Credentials("myAccessKeyId", "mySecretAccessKey");
-```
-Hardcoding your credentials client-side is obviously **extremely unsecure** and should never be done in a production environment.
-The best way to do this is with [Amazon Cognito](http://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html). This will allow you to securely communicate between the client-side code and AWS and is the approach recommended by Amazon.
-
- Once your IdentityPool and logins are setup, securly retrieve a token from your server-side code, pass it to the client, and then use AWS.CognitoIdentityCredentials object instead
-```javascript
-    var awsCredentials = new AWS.CognitoIdentityCredentials({
-        IdentityPoolId: 'us-west-2:some-guid-for-identity-pool-id',
-        IdentityId: 'us-west-2:some-guid-for-identity-id',
-        Logins: {
-            'cognito-identity.amazonaws.com': tokenReturnFromServer
-        }
-    });
-```
-
-Once you have you AWS Credentials object, configure ChattyKathy's settings and create an instance of her:
+### Basic Usage
 ```javascript
 	var settings = {
         awsCredentials: awsCredentials,
@@ -35,23 +16,31 @@ Once you have you AWS Credentials object, configure ChattyKathy's settings and c
     kathy.Speak("Hello world, my name is Kathy!");
     kathy.Speak("I can be used for an amazing user experience!");
 ```
-ChattyKathy will chain your commands together and not speak the next sentenece until the prior has been spoken. ChattyKathy can also return a Javascript Promise so that you can do something else once she's done speaking.
+ChattyKathy will chain your commands together and not speak the next sentenece until the prior has been spoken.
 
+### AWS Credentials
+First you need to configure your AWS Credentials. The quick and dirty way to do this is to pass your AWS AccessKeyId and SecretAccessKey directly to the AWS.Credentials object in the [AWS Javascript SDK](https://aws.amazon.com/sdk-for-browser/).
 ```javascript
-    kathy.SpeakWithPromise("I'm going to run a function!")
-        .then(doSomeFunction);
-    
-    function doSomeFunction() {
-        kathy.Speak("I did a function");
+var awsCredentials = new AWS.Credentials("myAccessKeyId", "mySecretAccessKey");
+var settings = {
+        awsCredentials: awsCredentials,
+        ...
     }
 ```
+Hardcoding your credentials client-side is obviously **extremely unsecure** and should never be done in a production environment.
+The proper way to approach this is with [Amazon Cognito](http://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html), which is the approach recommended by Amazon.
 
-If ChattyKathy is getting too chatty, you can tell her to shut up:
+ Once your IdentityPool and logins are setup, securly retrieve a token with your server-side code, pass it to the client, and configure an AWS.CognitoIdentityCredentials object:
 ```javascript
-    if (kathy.IsSpeaking()) {
-        kathy.ShutUp(); 
-    }
+    var awsCredentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: 'us-west-2:some-guid-for-identity-pool-id',
+        IdentityId: 'us-west-2:some-guid-for-identity-id',
+        Logins: {
+            'cognito-identity.amazonaws.com': tokenReturnedFromServer
+        }
+    });
 ```
+
 ## Usage
 ### ChattyKathy(settings);
 ##### Settings { JSON Object  }
@@ -71,3 +60,20 @@ Name | Returns | Details
 **ShutUp()** | void | Makes ChattyKathy quit speaking
 **ForgetCachedSpeech()** | void | Clears the localStorage of any cached speech
 
+#### Examples
+ ChattyKathy can return a Javascript Promise so that you can do something else once she's done speaking.
+```javascript
+    kathy.SpeakWithPromise("I'm going to run a function!")
+        .then(doSomeFunction);
+    
+    function doSomeFunction() {
+        kathy.Speak("I did a function");
+    }
+```
+
+If ChattyKathy is getting too chatty, you can tell her to shut up:
+```javascript
+    if (kathy.IsSpeaking()) {
+        kathy.ShutUp(); 
+    }
+```
