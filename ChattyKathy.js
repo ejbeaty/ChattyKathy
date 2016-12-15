@@ -1,4 +1,24 @@
-﻿
+﻿/*! ChattyKathy 1.0.1
+ * ©2016 Elliott Beaty
+ */
+
+/**
+ * @summary     ChattyKathy
+ * @description Wrapper for Amazon's AWS Polly Javascript SDK
+ * @version     1.0.1
+ * @file        ChattyKathy.js
+ * @author      Elliott Beaty
+ * @contact     elliott@elliottbeaty.com
+ * @copyright   Copyright 2016 Elliott Beaty
+ *
+ * This source file is free software, available under the following license:
+ *   MIT license - http://datatables.net/license/mit
+ *
+ * This source file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the license files for details.
+ *
+ */
 
 function ChattyKathy(settings) {
 
