@@ -1,6 +1,9 @@
 ﻿
 
-function ChattyKathy(awsAccessKey,awsSecretKey,awsRegion) {
+function ChattyKathy(settings) {
+
+    settings = getValidatedSettings(settings);
+    
 
     // Add audio node to html
     var elementId = "audioElement" + new Date().valueOf().toString();
@@ -8,27 +11,18 @@ function ChattyKathy(awsAccessKey,awsSecretKey,awsRegion) {
     var audioElement = document.getElementById(elementId);
 
     var isSpeaking = false;
-    var playlist = [];
+    
 
-    // Credentials
-    var awsCredentials = new AWS.Credentials({
-        accessKeyId: awsAccessKey,
-        secretAccessKey: awsSecretKey
-    });
-    // Config
-    AWS.config.update({
-        credentials: awsCredentials,
-        region: awsRegion
-    });
-
-    var polly = new AWS.Polly();
+    AWS.config.credentials = settings.awsCredentials;
+    AWS.config.region = settings.awsRegion;
 
     var kathy = {
         self: this,
+        playlist:[],
         // Speak
         Speak: function (msg) {
             if (isSpeaking) {
-                playlist.push(msg);
+                this.playlist.push(msg);
             } else {
                 say(msg).then(sayNext)
             }
@@ -45,6 +39,10 @@ function ChattyKathy(awsAccessKey,awsSecretKey,awsRegion) {
 
         IsSpeaking: function () {
             return isSpeaking;
+        },
+
+        ForgetCachedSpeech: function () {
+            localStorage.removeItem("chattyKathyDictionary");
         }
 
     }
@@ -58,45 +56,97 @@ function ChattyKathy(awsAccessKey,awsSecretKey,awsRegion) {
     function say(message) {
         return new Promise(function (successCallback, errorCallback) {
             isSpeaking = true;
-            requestSpeechFromAWS(message)
+            getAudio(message)
                 .then(playAudio)
                 .then(successCallback);
+
+            //requestSpeechFromAWS(message)
+            //    .then(playAudio)
+            //    .then(successCallback);
         });
     }
 
     // Say next
     function sayNext() {
-        if (playlist.length > 0) {
-            var msg = playlist[0];
-            playlist.splice(0, 1);
+        var list = kathy.playlist;
+        if (list.length > 0) {
+            var msg = list[0];
+            list.splice(0, 1);
             say(msg).then(sayNext);
+        }
+    }
+
+    // Get Audio
+    function getAudio(message) {
+        if (settings.cacheSpeech === false || requestSpeechFromLocalCache(message) === null) {
+            return requestSpeechFromAWS(message);
+        } else {
+            return requestSpeechFromLocalCache(message);
         }
     }
 
     // Make request to Amazon polly
     function requestSpeechFromAWS(message) {
-
         return new Promise(function (successCallback, errorCallback) {
-
+            var polly = new AWS.Polly();
             var params = {
                 OutputFormat: 'mp3',
                 Text: message,
-                VoiceId: 'Amy'
+                VoiceId: settings.pollyVoiceId
             }
             polly.synthesizeSpeech(params, function (error, data) {
                 if (error) {
-                    console.log("ERROR!")
                     errorCallback(error)
                 } else {
-                    successCallback(data.AudioStream)
+                    saveSpeechToLocalCache(message, data.AudioStream);
+                    successCallback(data.AudioStream);
                 }
             });
         });
     }
 
+    // Save to local cache
+    function saveSpeechToLocalCache(message, audioStream) {
+        var record = {
+            Message: message,
+            AudioStream: JSON.stringify(audioStream)
+        };
+        var localPlaylist = JSON.parse(localStorage.getItem("chattyKathyDictionary"));
+
+        if (localPlaylist === null) {
+            localPlaylist = [];
+            localPlaylist.push(record);
+        }else{
+            localPlaylist.push(record);
+
+        }
+        localStorage.setItem("chattyKathyDictionary", JSON.stringify(localPlaylist));
+    }
+
+    // Check local cache for audio clip
+    function requestSpeechFromLocalCache(message) {
+        
+        var audioDictionary = localStorage.getItem("chattyKathyDictionary");
+        if (audioDictionary === null) {
+            return null;
+        }
+        var audioStreamArray = JSON.parse(audioDictionary);
+        var audioStream = audioStreamArray.filter(function (record) {
+            
+            return record.Message === message;
+        })[0];;
+       
+        if (audioStream === null || typeof audioStream === 'undefined') {
+            return null;
+        } else {
+            return new Promise(function (successCallback, errorCallback) {
+                successCallback(JSON.parse(audioStream.AudioStream).data);
+            });
+        }
+    }
+
     // Play audio
     function playAudio(audioStream, callBack) {
-
         return new Promise(function (success, error) {
             var uInt8Array = new Uint8Array(audioStream);
             var arrayBuffer = uInt8Array.buffer;
@@ -110,6 +160,26 @@ function ChattyKathy(awsAccessKey,awsSecretKey,awsRegion) {
             });
             audioElement.play();
         });
+    }
+
+    // Validate settings
+    function getValidatedSettings(settings) {
+        if (typeof settings === 'undefined') {
+            throw "Settings must be provided to ChattyKathy's constructor";
+        }
+        if (typeof settings.awsCredentials === 'undefined') {
+            throw "A valid AWS Credentials object must be provided";
+        }
+        if (typeof settings.awsRegion === 'undefined' || settings.awsRegion.length < 1) {
+            throw "A valid AWS Region must be provided";
+        }
+        if (typeof settings.pollyVoiceId === 'undefined') {
+            settings.pollyVoiceId = "Amy";
+        }
+        if (typeof settings.cacheSpeech === 'undefined') {
+            settings.cacheSpeech === true;
+        }
+        return settings;
     }
 
     return kathy;
