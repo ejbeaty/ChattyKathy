@@ -146,7 +146,7 @@ function ChattyKathy(settings) {
     }
 
     // Play audio
-    function playAudio(audioStream, callBack) {
+    function playAudio(audioStream) {
         return new Promise(function (success, error) {
             var uInt8Array = new Uint8Array(audioStream);
             var arrayBuffer = uInt8Array.buffer;
