@@ -26,8 +26,9 @@ function ChattyKathy(settings) {
 
     // Add audio node to html
     var elementId = "audioElement" + new Date().valueOf().toString();
-    document.body.innerHTML += '<audio id="'+elementId+'" />';
-    var audioElement = document.getElementById(elementId);
+    var audioElement = document.createElement('audio');
+    audioElement.setAttribute("id", elementId);
+    document.body.appendChild(audioElement);
 
     var isSpeaking = false;
 
