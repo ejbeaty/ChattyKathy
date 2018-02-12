@@ -150,7 +150,7 @@ function ChattyKathy(settings) {
         var audioStream = audioStreamArray.filter(function (record) {
             
             return record.Message === message;
-        })[0];;
+        })[0];
        
         if (audioStream === null || typeof audioStream === 'undefined') {
             return null;
