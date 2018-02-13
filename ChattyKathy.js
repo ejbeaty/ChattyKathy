@@ -70,6 +70,7 @@ function ChattyKathy(settings) {
     function shutUp() {
         audioElement.pause();
         playlist = [];
+        isSpeaking = false;
     }
 
     // Speak the message
