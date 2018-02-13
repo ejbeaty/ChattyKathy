@@ -38,6 +38,7 @@ function ChattyKathy(settings) {
     var kathy = {
         self: this,
         playlist:[],
+        cb: null,
         // Speak
         Speak: function (msg) {
             if (isSpeaking) {
@@ -62,8 +63,17 @@ function ChattyKathy(settings) {
 
         ForgetCachedSpeech: function () {
             localStorage.removeItem("chattyKathyDictionary");
-        }
+        },
 
+        setFinalCallback: function (cb) {
+            this.cb = cb;
+        },
+
+        runFinalCallback: function () {
+            if (this.cb !== null) {
+                this.cb();
+            }
+        }
     }
 
     // Quit talking
@@ -89,6 +99,8 @@ function ChattyKathy(settings) {
             var msg = list[0];
             list.splice(0, 1);
             say(msg).then(sayNext);
+        } else {
+            kathy.runFinalCallback();
         }
     }
 
