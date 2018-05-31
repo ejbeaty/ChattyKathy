@@ -68,6 +68,7 @@ function ChattyKathy(settings) {
 
     // Quit talking
     function shutUp() {
+        isSpeaking = false;
         audioElement.pause();
         playlist = [];
     }
